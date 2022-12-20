@@ -1,0 +1,26 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+# Set the URL for the request
+url = "https://www.wunderground.com/history/daily/gb/london/EGLL/date/2015-1-1"
+
+# Send the request and retrieve the data
+response = requests.get(url)
+soup = BeautifulSoup(response.text, "html.parser")
+
+# Find the table with the weather data
+table = soup.find("table", class_="historical-observations")
+
+# Extract the data from the table
+data = []
+for row in table.find_all("tr"):
+    cols = row.find_all("td")
+    cols = [ele.text.strip() for ele in cols]
+    data.append(cols)
+
+# Convert the data to a Pandas DataFrame
+df = pd.DataFrame(data, columns=["Date", "High", "Low", "Average", "Precipitation", "Snowfall", "Snow Depth"])
+
+# Print the DataFrame
+print(df)
